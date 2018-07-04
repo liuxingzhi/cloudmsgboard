@@ -1,0 +1,52 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>云端留言板(1)首页</title>
+    <script src={% static 'jquery-3.3.1.js' %}></script>
+</head>
+<body>
+<h1>提交留言功能区</h1>
+<form action="/msggate/" method="post">
+    {% csrf_token %}
+    发送方<input type="text" name="UserA"/> <br>
+    接收方<input type="text" name="UserB"/> <br>
+    消息文<input type="text" name="msg"/> <br>
+    <input type="submit" value="留言提交">
+</form>
+<h1>获取留言信息</h1>
+<form action="/msggate/" method="get">
+    接收方<input type="text" name="userC"/> <br>
+    <button onclick="displayMsg();">留言获取</button>
+</form>
+<table border="1">
+    <thead>
+    <th>留言时间</th>
+    <th>留言来源</th>
+    <th>留言信息</th>
+    </thead>
+    <br>
+    <tbody>
+    {% for line in data %}
+        <tr>
+            <td>{{ line.time }}</td>
+            <td align="center">{{ line }}</td>
+            <td> {{ line.model }} </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<p>I will disappear when clicked</p>
+</body>
+<script>
+    function displayMsg(){
+        alert("woc!")
+    }
+    $(document).ready(function () {
+        $("p").click(function () {
+            $(this).hide();
+        });
+    });
+</script>
+</html>
