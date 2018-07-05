@@ -1,14 +1,15 @@
 from django.shortcuts import render
 from datetime import datetime
-from django.http.response import HttpResponse, JsonResponse, FileResponse,Http404
+from django.http.response import HttpResponse, JsonResponse, FileResponse, Http404
 from django.views.decorators.http import require_http_methods
-import os
+import os,json
 from .models import MsgBoard
 from django.core.serializers import serialize
 from django.core.serializers.json import DjangoJSONEncoder
 
+
 # Create your views here.
-@require_http_methods(["GET","POST"])
+@require_http_methods(["GET", "POST"])
 def msgproc(request):
     datalist = []
     if request.method == "POST":
@@ -25,16 +26,15 @@ def msgproc(request):
         #     f.write("{}--{}--{}--{}--\n".format(userB, userA, msg, time.strftime("%Y-%m-%d %H:%M:%S")))
 
     if request.method == "GET":
-        userC = request.GET.get("userC", None)
-        if userC != None:
-            try:
-                records = MsgBoard.objects.filter(receiver=userC)
-                datalist = serialize('json',records)
-                print(datalist)
-                for data in datalist:
-                    print(data)
-            except MsgBoard.DoesNotExist:
-                raise Http404("No message left to this user")
+        pass
+        # userC = request.GET.get("userC", None)
+        # if userC != None:
+        #     try:
+        #         records = MsgBoard.objects.filter(receiver=userC)
+        #         datalist = serialize('json', records)
+        #         print(datalist)
+        #     except MsgBoard.DoesNotExist:
+        #         raise Http404("No message left to this user")
             # with open("msgdata.txt", "r") as f:
             #     cnt = 0
             #     for line in f:
@@ -55,7 +55,21 @@ def homeproc(request):
     response.write("<h2>this is a small title</h2>")
     return response
 
-def ajax(request):
+
+def msg_ajax(request, receiver):
+    if receiver != None:
+        try:
+            records = MsgBoard.objects.filter(receiver=receiver)
+            json_dict = serialize('json', records)
+            # print(json_dict)
+            # something = json.loads(json_dict)
+            # print(type(something))
+            # for a in something:
+            #     print(a)
+            json_response = JsonResponse(json_dict, safe=False)
+            return json_response
+        except MsgBoard.DoesNotExist:
+            raise Http404("No message left to this user")
 
 
 def homeproc2(request):

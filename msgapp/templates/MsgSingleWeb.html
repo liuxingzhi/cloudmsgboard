@@ -1,8 +1,8 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-cmn-Hans">
 <head>
-    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title>云端留言板(1)首页</title>
     <script src={% static 'jquery-3.3.1.js' %}></script>
 </head>
@@ -16,37 +16,80 @@
     <input type="submit" value="留言提交">
 </form>
 <h1>获取留言信息</h1>
-<form action="/msggate/" method="get">
-    接收方<input type="text" name="userC"/> <br>
-    <button onclick="displayMsg();">留言获取</button>
-</form>
+接收方<input type="text" name="userC"/> <br>
+<button onclick="displayMsg()">留言获取</button>
+<button onclick="clearMsg()">清除</button>
 <table border="1">
     <thead>
     <th>留言时间</th>
     <th>留言来源</th>
     <th>留言信息</th>
     </thead>
-    <br>
     <tbody>
-    {% for line in data %}
-        <tr>
-            <td>{{ line.time }}</td>
-            <td align="center">{{ line }}</td>
-            <td> {{ line.model }} </td>
-        </tr>
-    {% endfor %}
+    {#    {% for line in data %}#}
+    {#        <tr>#}
+    {#            <td>{{ line.time }}</td>#}
+    {#            <td align="center">{{ line }}</td>#}
+    {#            <td> {{ line.model }} </td>#}
+    {#        </tr>#}
+    {#    {% endfor %}#}
     </tbody>
 </table>
-<p>I will disappear when clicked</p>
 </body>
 <script>
-    function displayMsg(){
-        alert("woc!")
+    function displayMsg() {
+        console.log("enter display function");
+        var receiver = $("input[name='userC']").val();
+        {#alert(receiver);#}
+        $.ajax({
+            url: "/msggate/ajax/" + receiver,
+            type: 'GET', //GET
+            async: true,    //或false,是否异步
+            timeout: 50000,    //超时时间
+            dataType: 'json',    //返回的数据格式：json/xml/html/script/jsonp/text
+            success: function (data, textStatus, jqXHR) {
+                console.log(data);
+                var records = JSON.parse(data);
+                console.log(records);
+                refresh_tbody(records)
+            }
+        })
     }
-    $(document).ready(function () {
-        $("p").click(function () {
-            $(this).hide();
-        });
-    });
+
+    function refresh_tbody(records) {
+        var table = document.getElementsByTagName("table")[0];
+        var old_tbody = document.getElementsByTagName("tbody")[0];
+        var tbody = document.createElement("tbody");
+        for (var i = 0; i < records.length; i++) {
+            console.log(records[i].fields);
+            var msg_dict = records[i].fields;
+            var time = records[i].pk;
+            var sender = msg_dict['sender'];
+            var receiver = msg_dict['receiver'];
+            var message = msg_dict['message'];
+
+            var tr = document.createElement("tr");
+            var td1 = document.createElement("td");
+            td1.innerHTML = time;
+            var td2 = document.createElement("td");
+            td2.innerHTML = sender;
+            var td3 = document.createElement("td");
+            td3.innerHTML = message;
+            tr.appendChild(td1);
+            tr.appendChild(td2);
+            tr.appendChild(td3);
+            tbody.appendChild(tr);
+        }
+        table.replaceChild(tbody,old_tbody);
+        console.log("message retrieval complete");
+    }
+
+    function clearMsg() {
+        var table = document.getElementsByTagName("table")[0];
+        var old_tbody = document.getElementsByTagName("tbody")[0];
+        var tbody = document.createElement("tbody");
+        table.replaceChild(tbody,old_tbody);
+        console.log("message cleared.");
+    }
 </script>
 </html>
