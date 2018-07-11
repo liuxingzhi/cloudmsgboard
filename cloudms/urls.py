@@ -21,5 +21,5 @@ urlpatterns = [
     re_path('msggate/', include('msgapp.urls')),
     path('admin/', admin.site.urls),
     path('',msgviews.homeproc),
-    path('fate/',msgviews.download_lingxiang),
+    path('fate/',msgviews.download_lingxiang,name="fate"),
 ]

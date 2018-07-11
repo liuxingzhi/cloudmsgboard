@@ -21,9 +21,12 @@
 <button onclick="clearMsg()">清除</button>
 <table border="1">
     <thead>
-    <th>留言时间</th>
-    <th>留言来源</th>
-    <th>留言信息</th>
+    {% for header in data %}
+        <th>{{  header }}</th>
+    {% endfor %}
+{#    <th>留言时间</th>#}
+{#    <th>留言来源</th>#}
+{#    <th>留言信息</th>#}
     </thead>
     <tbody>
     {#    {% for line in data %}#}
