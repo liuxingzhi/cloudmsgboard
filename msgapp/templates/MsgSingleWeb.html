@@ -17,7 +17,8 @@
 </form>
 <h1>获取留言信息</h1>
 接收方<input type="text" name="userC"/> <br>
-<button onclick="displayMsg()">留言获取</button>
+<button onclick="displayUnreadMsg()">未读留言</button>
+<button onclick="displayAllMsg()">所有留言</button>
 <button onclick="clearMsg()">清除</button>
 <table border="1">
     <thead>
@@ -40,12 +41,31 @@
 </table>
 </body>
 <script>
-    function displayMsg() {
+    function displayAllMsg() {
         console.log("enter display function");
         var receiver = $("input[name='userC']").val();
         {#alert(receiver);#}
         $.ajax({
-            url: "/msggate/ajax/" + receiver,
+            url: "/msggate/ajax/" + receiver + "/all",
+            type: 'GET', //GET
+            async: true,    //或false,是否异步
+            timeout: 50000,    //超时时间
+            dataType: 'json',    //返回的数据格式：json/xml/html/script/jsonp/text
+            success: function (data, textStatus, jqXHR) {
+                console.log(data);
+                var records = JSON.parse(data);
+                console.log(records);
+                refresh_tbody(records)
+            }
+        })
+    }
+
+    function displayUnreadMsg() {
+        console.log("enter display function");
+        var receiver = $("input[name='userC']").val();
+        {#alert(receiver);#}
+        $.ajax({
+            url: "/msggate/ajax/" + receiver + "/unread",
             type: 'GET', //GET
             async: true,    //或false,是否异步
             timeout: 50000,    //超时时间

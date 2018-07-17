@@ -24,12 +24,14 @@ def msgproc(request):
         pass
 
     fields = MsgBoard._meta.fields
-    for f in fields:
+    for index, f in enumerate(fields):
         if f.verbose_name != '留言目标':
             print(f.verbose_name)
             datalist.append(f.verbose_name)
-
-    return render(request, "MsgSingleWeb.html",{"data":datalist})
+    print(datalist)
+    datalist.remove("read")
+    print(datalist)
+    return render(request, "MsgSingleWeb.html", {"data": datalist})
 
 
 def homeproc(request):
@@ -39,16 +41,35 @@ def homeproc(request):
     return response
 
 
-def msg_ajax(request, receiver):
+def all_msg_ajax(request, receiver):
+    print("collecting receiver's all messages")
     if receiver != None:
         try:
             records = MsgBoard.objects.filter(receiver=receiver)
+            for record in records:
+                record.read = True
+                record.save()
             json_dict = serialize('json', records)
             # print(json_dict)
             # something = json.loads(json_dict)
             # print(type(something))
             # for a in something:
             #     print(a)
+            json_response = JsonResponse(json_dict, safe=False)
+            return json_response
+        except MsgBoard.DoesNotExist:
+            raise Http404("No message left to this user")
+
+
+def unread_msg_ajax(request, receiver):
+    print("collect unread messages")
+    if receiver != None:
+        try:
+            records = MsgBoard.objects.filter(receiver=receiver).filter(read=False)
+            for record in records:
+                record.read = True
+                record.save()
+            json_dict = serialize('json', records)
             json_response = JsonResponse(json_dict, safe=False)
             return json_response
         except MsgBoard.DoesNotExist:
