@@ -23,11 +23,11 @@
 <table border="1">
     <thead>
     {% for header in data %}
-        <th>{{  header }}</th>
+        <th>{{ header }}</th>
     {% endfor %}
-{#    <th>留言时间</th>#}
-{#    <th>留言来源</th>#}
-{#    <th>留言信息</th>#}
+    {#    <th>留言时间</th>#}
+    {#    <th>留言来源</th>#}
+    {#    <th>留言信息</th>#}
     </thead>
     <tbody>
     {#    {% for line in data %}#}
@@ -43,7 +43,7 @@
 <script>
     function displayAllMsg() {
         console.log("enter display function");
-        var receiver = $("input[name='userC']").val();
+        let receiver = $("input[name='userC']").val();
         {#alert(receiver);#}
         $.ajax({
             url: "/msggate/ajax/" + receiver + "/all",
@@ -53,7 +53,7 @@
             dataType: 'json',    //返回的数据格式：json/xml/html/script/jsonp/text
             success: function (data, textStatus, jqXHR) {
                 console.log(data);
-                var records = JSON.parse(data);
+                let records = JSON.parse(data);
                 console.log(records);
                 refresh_tbody(records)
             }
@@ -62,7 +62,7 @@
 
     function displayUnreadMsg() {
         console.log("enter display function");
-        var receiver = $("input[name='userC']").val();
+        let receiver = $("input[name='userC']").val();
         {#alert(receiver);#}
         $.ajax({
             url: "/msggate/ajax/" + receiver + "/unread",
@@ -72,7 +72,7 @@
             dataType: 'json',    //返回的数据格式：json/xml/html/script/jsonp/text
             success: function (data, textStatus, jqXHR) {
                 console.log(data);
-                var records = JSON.parse(data);
+                let records = JSON.parse(data);
                 console.log(records);
                 refresh_tbody(records)
             }
@@ -80,39 +80,62 @@
     }
 
     function refresh_tbody(records) {
-        var table = document.getElementsByTagName("table")[0];
-        var old_tbody = document.getElementsByTagName("tbody")[0];
-        var tbody = document.createElement("tbody");
-        for (var i = 0; i < records.length; i++) {
+        let table = document.getElementsByTagName("table")[0];
+        let old_tbody = document.getElementsByTagName("tbody")[0];
+        let tbody = document.createElement("tbody");
+        for (let i = 0; i < records.length; i++) {
             console.log(records[i].fields);
-            var msg_dict = records[i].fields;
-            var time = records[i].pk;
-            var sender = msg_dict['sender'];
-            var receiver = msg_dict['receiver'];
-            var message = msg_dict['message'];
+            let msg_dict = records[i].fields;
+            let time = records[i].pk;
+            let sender = msg_dict['sender'];
+            let receiver = msg_dict['receiver'];
+            let message = msg_dict['message'];
 
-            var tr = document.createElement("tr");
-            var td1 = document.createElement("td");
+            let tr = document.createElement("tr");
+            let td1 = document.createElement("td");
             td1.innerHTML = time;
-            var td2 = document.createElement("td");
+            let td2 = document.createElement("td");
             td2.innerHTML = sender;
-            var td3 = document.createElement("td");
+            let td3 = document.createElement("td");
             td3.innerHTML = message;
             tr.appendChild(td1);
             tr.appendChild(td2);
             tr.appendChild(td3);
             tbody.appendChild(tr);
         }
-        table.replaceChild(tbody,old_tbody);
+        table.replaceChild(tbody, old_tbody);
         console.log("message retrieval complete");
     }
 
     function clearMsg() {
-        var table = document.getElementsByTagName("table")[0];
-        var old_tbody = document.getElementsByTagName("tbody")[0];
-        var tbody = document.createElement("tbody");
-        table.replaceChild(tbody,old_tbody);
+        let table = document.getElementsByTagName("table")[0];
+        let old_tbody = document.getElementsByTagName("tbody")[0];
+        let tbody = document.createElement("tbody");
+        table.replaceChild(tbody, old_tbody);
         console.log("message cleared.");
+    }
+
+    window.onbeforeprint = function () {
+        console.log('This will be called before the user prints.');
+        console.log("enter display function");
+        let receiver = $("input[name='userC']").val();
+        {#alert(receiver);#}
+        $.ajax({
+            url: "/msggate/ajax/" + receiver + "/unread",
+            type: 'GET', //GET
+            async: true,    //或false,是否异步
+            timeout: 50000,    //超时时间
+            dataType: 'json',    //返回的数据格式：json/xml/html/script/jsonp/text
+            success: function (data, textStatus, jqXHR) {
+                console.log(data);
+                let records = JSON.parse(data);
+                console.log(records);
+                refresh_tbody(records)
+            }
+        })
+    }
+    window.onafterprint = function () {
+        console.log('This will be called after the user prints');
     }
 </script>
 </html>

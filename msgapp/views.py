@@ -43,7 +43,7 @@ def homeproc(request):
 
 def all_msg_ajax(request, receiver):
     print("collecting receiver's all messages")
-    if receiver != None:
+    if receiver is not None:
         try:
             records = MsgBoard.objects.filter(receiver=receiver)
             for record in records:
@@ -63,7 +63,8 @@ def all_msg_ajax(request, receiver):
 
 def unread_msg_ajax(request, receiver):
     print("collect unread messages")
-    if receiver != None:
+    print("receive print request from 前端")
+    if receiver is not None:
         try:
             records = MsgBoard.objects.filter(receiver=receiver).filter(read=False)
             for record in records:
@@ -71,9 +72,11 @@ def unread_msg_ajax(request, receiver):
                 record.save()
             json_dict = serialize('json', records)
             json_response = JsonResponse(json_dict, safe=False)
+            # return None
             return json_response
         except MsgBoard.DoesNotExist:
-            raise Http404("No message left to this user")
+            # raise Http404("No message left to this user")
+            return None
 
 
 def homeproc2(request):
